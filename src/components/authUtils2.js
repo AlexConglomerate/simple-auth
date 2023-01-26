@@ -10,14 +10,13 @@ export const httpAuth = axios.create({
 });
 
 
-export const logIn = async ({email, password}) => {
+async function logIn({email, password}) {
     try {
         const {data} = await httpAuth.post(
             `accounts:signInWithPassword`,
             {email, password, returnSecureToken: true}
         );
         setTokens(data);
-        console.log('Пользоваетель зашёл в сиситему', data)
 
     } catch (error) {
         errorCatcher(error);
@@ -26,14 +25,14 @@ export const logIn = async ({email, password}) => {
     }
 }
 
-export const logOut = () => {
+function logOut() {
     // localStorageService.removeAuthData();
     // setUser(null);
     // history.push("/");
 }
 
 
-export const signUp = async ({email, password}) => {
+async function signUp({email, password}) {
     try {
         const {data} = await httpAuth.post(`accounts:signUp`, {
             email,
@@ -41,7 +40,6 @@ export const signUp = async ({email, password}) => {
             returnSecureToken: true
         });
         setTokens(data);
-        console.log(`Пользователь зарегистрирован`, data)
 
     } catch (error) {
         errorCatcher(error);

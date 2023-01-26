@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {signUp} from "./authUtils";
+import {logIn, signUp} from "./authUtils";
 
 function AuthForm(props) {
     const [email, setEmail] = useState('hello@ggmail.com');
@@ -23,6 +23,10 @@ function AuthForm(props) {
         await signUp(obj)
     }
 
+    const handleLogIn = async () => {
+        await logIn({email, password})
+    }
+
     return (
         <div className={'border-2 border-cyan-800 m-5 p-5 w-min'}>
             <div className={'flex flex-row'}>
@@ -35,6 +39,9 @@ function AuthForm(props) {
             </div>
             <button className={btn + ' mt-5 '} onClick={handleSignUp}>
                 Регистрация (создание нового пользователя)
+            </button>
+            <button className={btn + ' mt-5 '} onClick={handleLogIn}>
+                Авторизация (Вход в систему)
             </button>
         </div>
     );
