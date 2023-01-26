@@ -4,6 +4,7 @@ import axios from "axios";
 function Auth(props) {
 
 // Отправка запроса на сервер
+    const KEY = 'AIzaSyASQbVny6OlTuqD0q0tmUKiVkeo2bFflqg'
     async function signUp({email, password}) {
         const url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${KEY}`;
         const httpAuth = axios.create();

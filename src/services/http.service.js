@@ -3,13 +3,15 @@ import {logger} from "./log.servise";
 import {toast} from "react-toastify";
 import configFile from "../config.json";
 
-axios.defaults.baseURL = configFile.apiEndPoint
+const http = axios.create({
+    baseURL: configFile.apiEndPoint
+})
 
-// axios.interceptors.response - это перехватчик ответа с сервера
-// axios.interceptors.request - это перехватчик запросов\
+// http.interceptors.response - это перехватчик ответа с сервера
+// http.interceptors.request - это перехватчик запросов\
 
 // Если ошибка, меняем / на .json, и снова делаем запрос
-axios.interceptors.request.use(
+http.interceptors.request.use(
     function (config) {
         if (configFile.isFireBase) {
             const containSlash = /\/$/gi.test(config.url);
@@ -32,7 +34,7 @@ function transformData(data) {
 }
 
 // Тут перехватываем ошибки сервера. interceptors - перехватчики. response - ошибки
-axios.interceptors.response.use(
+http.interceptors.response.use(
     (res) => {
         if (configFile.isFireBase) {
             res.data = {content: transformData(res.data)};
@@ -54,10 +56,10 @@ axios.interceptors.response.use(
 
 
 const httpService = {
-    get: axios.get,
-    post: axios.post,
-    put: axios.put,
-    delete: axios.delete,
+    get: http.get,
+    post: http.post,
+    put: http.put,
+    delete: http.delete,
 }
 
 export default httpService
