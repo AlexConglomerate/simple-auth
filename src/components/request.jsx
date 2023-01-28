@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {toast} from "react-toastify";
 import usersService from "../services/users.service";
 import {nanoid} from "nanoid";
+import CreateMockData from "./createMockData";
 
 function Request() {
     const [users, setUsers] = useState()
@@ -68,15 +69,12 @@ function Request() {
 
     const handleDelete = async (id) => {
         try {
-            const {content} = await usersService.delete(id)
-            if (content.length === 0) {
-                const newUsers = [...users]
-                const index = newUsers.findIndex(item => item._id === id)
-                newUsers.splice(index, 1)
-                setUsers(newUsers)
-                toast('Пользователь удалён!')
-
-            }
+            await usersService.delete(id)
+            const newUsers = [...users]
+            const index = newUsers.findIndex(item => item._id === id)
+            newUsers.splice(index, 1)
+            setUsers(newUsers)
+            toast('Пользователь удалён!')
         } catch (e) {
             errorCatcher(e)
         }
@@ -84,28 +82,25 @@ function Request() {
 
     const btn = ' bg-yellow-300 p-2 m-2 rounded-lg hover:bg-yellow-400 '
     const cell = ' p-1 border-[0.5px] border-cyan-800 w-56 '
+    const cellDelete = cell + ' bg-pink-400 cursor-pointer w-16 '
+    const cellEdit = cell + ' bg-green-400 cursor-pointer w-16 '
 
     return (
-        <div className={'flex flex-row '}>
+        <div className={'flex flex-row border-2 border-cyan-800 m-5 p-5 w-min '}>
             <div className={"border-0 m-4 "}>
-                <button className={btn} onClick={handleGetUsers}>
-                    Загрузить пользователей
-                </button>
-                {users && <button className={btn} onClick={handleAddUsers}>
-                    Добавить нового пользователя
-                </button>}
+                <div className={'flex flex-row mb-2 '}>
+                    <CreateMockData/>
+                    <button className={btn} onClick={handleGetUsers}> Скачать пользователей</button>
+                    {users && <button className={btn} onClick={handleAddUsers}> Добавить нового пользователя </button>}
+                </div>
                 {users &&
                     users.map(item => (
                         <div className={'flex flex-row'}>
                             <div className={cell}>{item.name}</div>
                             <div className={cell}>{item.email}</div>
                             <div className={cell}>{item.profession}</div>
-                            <div className={cell + ' bg-pink-400 cursor-pointer w-16 '}
-                                 onClick={() => handleDelete(item._id)}>delete
-                            </div>
-                            <div className={cell + ' bg-green-400 cursor-pointer w-16 '}
-                                 onClick={() => handleEdit(item)}>edit
-                            </div>
+                            <div className={cellDelete} onClick={() => handleDelete(item._id)}>delete</div>
+                            <div className={cellEdit} onClick={() => handleEdit(item)}>edit</div>
                         </div>
                     ))
                 }

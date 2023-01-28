@@ -27,8 +27,8 @@ function CreateMockData() {
         <div>
             <button
                 className={' bg-yellow-300 p-2 m-2 rounded-lg hover:bg-yellow-400 '}
-                onClick={handleClick}
-            >Отправить данные а FireBase
+                onClick={handleClick}>
+                Отправить данные в FireBase
             </button>
         </div>
     );

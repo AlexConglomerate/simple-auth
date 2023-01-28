@@ -1,5 +1,6 @@
 import axios from "axios";
-import {setTokens} from "../services/localStorage.service";
+import localStorageService, {setTokens} from "../services/localStorage.service";
+import usersService from "../services/users.service";
 
 
 export const httpAuth = axios.create({
@@ -27,21 +28,26 @@ export const logIn = async ({email, password}) => {
 }
 
 export const logOut = () => {
-    // localStorageService.removeAuthData();
+    localStorageService.removeAuthData();
     // setUser(null);
     // history.push("/");
 }
 
-
-export const signUp = async ({email, password}) => {
+export const signUp = async ({email, password, name, profession}) => {
     try {
+
+        // делаем регистрацию
         const {data} = await httpAuth.post(`accounts:signUp`, {
             email,
             password,
             returnSecureToken: true
         });
+
+        // записываем токены в localStorage
         setTokens(data);
-        console.log(`Пользователь зарегистрирован`, data)
+
+        // создаём юзера в БД с localId, который получили при регистрации
+        await usersService.add({_id: data.localId, email, password, name, profession})
 
     } catch (error) {
         errorCatcher(error);
