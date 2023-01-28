@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {logIn, logOut, signUp} from "./authUtils";
 import TextField from "./textField";
 import usersService from "../services/users.service";
-import localStorageService from "../services/localStorage.service";
+import localStorageService, {setTokens} from "../services/localStorage.service";
 import authService from "../services/auth.service";
+import {toast} from "react-toastify";
 
 function AuthForm() {
     const [user, setUser] = useState(); // Данные о юзере. Подтягиваем с сервера.
@@ -18,17 +18,28 @@ function AuthForm() {
     }
 
     const handleSignUp = async () => {
-        await signUp(values)
-        getUserData()
+        try {
+            const data = await authService.register(values) // делаем регистрацию в FireBase
+            setTokens(data) // записываем полученные токены в localStorage
+            await usersService.add({_id: data.localId, ...values}) // создаём юзера в БД с localId, который получили при регистрации
+            await getUserData() // сохраняем пользователя в state
+        } catch (error) {
+            errorCatcher(error)
+        }
     }
     const handleLogIn = async () => {
-        // await authService.register(values)
-        await logIn(values)
-        getUserData()
+        try {
+            const data = await authService.login(values) // отправляем в FireBase логин и пароль
+            setTokens(data) // записываем токены в localStorage
+            await getUserData() // сохраняем пользователя в state
+        } catch (error) {
+            errorCatcher(error)
+        }
     }
+
     const handleLogOut = async () => {
-        await logOut()
-        setUser(null)
+        localStorageService.removeAuthData() // Удаляем все токены из localStorage
+        setUser(null) // обнуляем state
     }
 
 
@@ -37,11 +48,15 @@ function AuthForm() {
             const {content} = await usersService.getCurrentUser();
             setUser(content);
         } catch (error) {
-            console.log(`error`, error)
-            // errorCatcher(error);
-        } finally {
-            // setLoading(false);
+            errorCatcher(error);
         }
+    }
+
+    function errorCatcher(error) {
+        console.log(`errorCatcher`, error)
+        const {message} = error
+        toast.error(message)
+        console.log(`message`, message)
     }
 
     useEffect(() => {

@@ -2,8 +2,8 @@ import axios from "axios";
 import {logger} from "./log.servise";
 import {toast} from "react-toastify";
 import configFile from "../config.json";
-import {httpAuth} from "../components/authUtils";
 import localStorageService from "./localStorage.service";
+import authService from "./auth.service";
 
 const http = axios.create({
     baseURL: configFile.apiEndPoint
@@ -20,10 +20,12 @@ http.interceptors.request.use(
             config.url =
                 (containSlash ? config.url.slice(0, -1) : config.url) + ".json";
 
+
+            // для обновления токена
             const expiresDate = localStorageService.getTokenExpiresDate();
             const refreshToken = localStorageService.getRefreshToken();
-            if (refreshToken && expiresDate < Date.now()) {
-                const {data} = await httpAuth.post("token", {
+            if (refreshToken && expiresDate < Date.now()) { // не истёк ли срок годности access токена
+                const {data} = await authService.httpAuth.post("token", {
                     grant_type: "refresh_token",
                     refresh_token: refreshToken
                 });
@@ -35,9 +37,11 @@ http.interceptors.request.use(
                     localId: data.user_id
                 });
             }
-            const accessToken = localStorageService.getAccessToken();
+
+            const accessToken = localStorageService.getAccessToken()
             if (accessToken) {
-                config.params = {...config.params, auth: accessToken};
+                // благодаря этому мы делаем запрос авторизованным, и можем обращаться к защищённым данным.
+                config.params = {...config.params, auth: accessToken}
             }
 
         }
