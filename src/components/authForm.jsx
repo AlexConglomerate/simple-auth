@@ -3,38 +3,34 @@ import {logIn, logOut, signUp} from "./authUtils";
 import TextField from "./textField";
 import usersService from "../services/users.service";
 import localStorageService from "../services/localStorage.service";
+import authService from "../services/auth.service";
 
 function AuthForm() {
-    const [user, setUser] = useState();
+    const [user, setUser] = useState(); // Данные о юзере. Подтягиваем с сервера.
+
     const [values, setValues] = useState({
-        email: "hello@ggmail.com",
-        password: "123123",
-        name: "Alex",
-        profession: "player"
+        email: "hello@ggmail.com", password: "123123", name: "Alex", profession: "player"
     });
-    const [auth, setAuth] = useState(false);
 
     const handleChange = e => {
         const {value, name} = e.target;
         setValues(prev => ({...prev, [name]: value}));
-    };
-
-    const btn = ' bg-yellow-300 p-2 m-2 rounded-lg hover:bg-yellow-400  mt-2  '
+    }
 
     const handleSignUp = async () => {
         await signUp(values)
         getUserData()
     }
     const handleLogIn = async () => {
+        // await authService.register(values)
         await logIn(values)
         getUserData()
     }
     const handleLogOut = async () => {
         await logOut()
-        getUserData()
+        setUser(null)
     }
 
-    const cell = ' p-1 border-[0.5px] border-cyan-800 w-28 pl-2 '
 
     async function getUserData() {
         try {
@@ -57,6 +53,9 @@ function AuthForm() {
         }
     }, []);
 
+    const btn = ' bg-yellow-300 p-2 m-2 rounded-lg hover:bg-yellow-400  mt-2  '
+    const cell = ' p-1 border-[0.5px] border-cyan-800 w-28 pl-2 '
+
     return (
         <>
             <div className={'border-2 border-cyan-800 mr-7 p-5 w-min'}>
@@ -66,7 +65,8 @@ function AuthForm() {
                             <div>Ты в системе 🥳</div>
                             <div>{`Ты ${user.name}, ${user.profession}`}</div>
                         </>)
-                        : 'Войдите в систему'}
+                        : 'Войдите в систему'
+                    }
 
                 </div>
 
@@ -82,7 +82,6 @@ function AuthForm() {
                     <button className={btn} onClick={handleLogOut}>Выйти</button>
                 </div>
             </div>
-
 
             <div className={'border-2 border-cyan-800 p-5 w-min'}>
                 <div className={'text-3xl text-amber-800 mb-3'}>Users list</div>
